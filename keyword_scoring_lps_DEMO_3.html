@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Keyword Scoring Master — DEMO</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F7F9FC;
+  --surface:#FFFFFF;
+  --surface2:#F1F5F9;
+  --border:#E2E8F0;
+  --border-s:#CBD5E1;
+  --pro:#6366F1;--pro-h:#4F46E5;--pro-bg:#EEF2FF;--pro-border:#A5B4FC;
+  --text:#111827;--text2:#374151;--text3:#6B7280;--text4:#9CA3AF;
+  --green:#22C55E;--green-bg:#F0FDF4;--green-border:#86EFAC;--green-dark:#15803D;
+  --amber:#F59E0B;--amber-bg:#FFFBEB;--amber-border:#FCD34D;--amber-dark:#92400E;
+  --red:#EF4444;--red-bg:#FEF2F2;--red-border:#FCA5A5;--red-dark:#991B1B;
+  --blue:#6366F1;--blue-bg:#EEF2FF;--blue-border:#A5B4FC;
+  --radius:12px;--radius-sm:8px;
+}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh}
+
+/* DEMO BANNER */
+.demo-banner{background:#FFFBEB;border-bottom:1px solid #FCD34D;padding:.65rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.demo-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.demo-banner-text{font-size:12px;color:var(--amber-dark);font-family:'DM Mono',monospace;display:flex;align-items:center;gap:10px}
+.btn-banner{background:var(--pro);color:#fff;border:none;padding:7px 18px;border-radius:20px;font-size:11px;font-weight:700;font-family:'DM Mono',monospace;cursor:pointer;letter-spacing:.5px;transition:all .15s;white-space:nowrap;box-shadow:0 2px 8px rgba(99,102,241,.3)}
+.btn-banner:hover{background:var(--pro-h);transform:translateY(-1px)}
+
+.app{max-width:1100px;margin:0 auto;padding:2rem 1.5rem 0}
+
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:42px;height:42px;background:var(--pro);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 12px rgba(99,102,241,.3)}
+.logo-text{font-size:1.15rem;font-weight:700;color:var(--text);letter-spacing:-.4px}
+.logo-sub{font-size:11px;color:var(--text4);font-family:'DM Mono',monospace;margin-top:1px}
+.badge-demo{background:var(--amber-bg);color:var(--amber-dark);border:1.5px solid var(--amber-border);font-size:11px;padding:4px 12px;border-radius:20px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.5px}
+
+/* SECTION */
+.section-header{display:flex;align-items:center;gap:10px;margin:2rem 0 .85rem}
+.sec-num{font-size:10px;font-family:'DM Mono',monospace;color:var(--text4);letter-spacing:2px;background:var(--surface);border:1px solid var(--border);padding:2px 8px;border-radius:20px;white-space:nowrap}
+.sec-title{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap}
+.sec-line{flex:1;height:1px;background:var(--border)}
+.sec-tag{background:var(--pro-bg);color:var(--pro);border:1px solid var(--pro-border);font-size:10px;font-family:'DM Mono',monospace;padding:3px 10px;border-radius:20px;font-weight:700;white-space:nowrap;cursor:pointer;transition:all .12s}
+.sec-tag:hover{background:var(--pro);color:#fff}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border-s);border-radius:var(--radius);padding:1.5rem;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:.75rem}
+
+/* INPUT PANEL — hero */
+.input-panel{background:var(--surface);border:1.5px solid var(--border-s);border-radius:var(--radius);padding:1.5rem;margin-bottom:.75rem;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.input-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;align-items:end;gap:.75rem}
+.field{display:flex;flex-direction:column;gap:6px}
+.field-label{font-size:11px;color:var(--text3);letter-spacing:.5px;font-family:'DM Mono',monospace;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.field input{background:var(--surface);border:1px solid var(--border-s);border-radius:var(--radius-sm);padding:10px 14px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:500;outline:none;transition:all .15s}
+.field input:focus{border-color:var(--pro);box-shadow:0 0 0 2px rgba(99,102,241,.15)}
+.field input::placeholder{color:var(--text4);font-weight:400}
+.field input:disabled{background:var(--surface2);opacity:.45;cursor:not-allowed}
+
+/* DERIVED */
+.derived-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-top:.85rem}
+.derived-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between}
+.derived-card.hl{border-color:var(--pro-border);background:var(--pro-bg)}
+.derived-card.locked{opacity:.45}
+.derived-label{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;display:flex;align-items:center;gap:5px}
+.derived-sub{font-size:10px;color:var(--text4);margin-top:2px}
+.derived-val{font-size:1.15rem;font-weight:700;color:var(--pro);font-family:'DM Mono',monospace}
+
+/* PRO LOCK */
+.pro-lock{display:inline-flex;align-items:center;gap:3px;background:var(--pro-bg);color:var(--pro);border:1px solid var(--pro-border);border-radius:5px;padding:1px 6px;font-size:10px;font-family:'DM Mono',monospace;font-weight:700;cursor:pointer;transition:all .12s;vertical-align:middle}
+.pro-lock:hover{background:var(--pro);color:#fff}
+
+/* AUDIT */
+.audit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.audit-field{display:flex;flex-direction:column;gap:5px}
+.audit-lbl{font-size:13px;font-weight:600;color:var(--text)}
+.audit-sub{font-size:10px;color:var(--text4);font-family:'DM Mono',monospace}
+.slider-row{display:flex;align-items:center;gap:10px;margin-top:5px}
+.slider-row input[type=range]{flex:1;-webkit-appearance:none;height:5px;border-radius:3px;background:var(--border-s);outline:none}
+.slider-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--pro);border:2px solid #fff;cursor:pointer;box-shadow:0 1px 4px rgba(99,102,241,.3)}
+.slider-num{font-size:14px;font-weight:700;min-width:28px;text-align:right;color:var(--text);font-family:'DM Mono',monospace}
+
+/* MULT */
+.mult-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+
+/* RESULTS */
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+@media(max-width:640px){.results-grid,.mult-grid{grid-template-columns:1fr}.input-grid{grid-template-columns:1fr 1fr!important}.derived-row{grid-template-columns:repeat(2,1fr)!important}.audit-grid{grid-template-columns:repeat(2,1fr)!important}}
+
+/* SCORE CARD — HERO */
+.score-card{background:var(--surface);border:1.5px solid var(--border-s);border-radius:var(--radius);padding:2rem;display:flex;flex-direction:column;align-items:center;gap:.9rem;box-shadow:0 4px 20px rgba(0,0,0,.07)}
+.ring-wrap{position:relative;width:170px;height:170px}
+.ring-wrap svg{width:170px;height:170px}
+.ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.ring-score{font-size:3.2rem;font-weight:700;line-height:1;letter-spacing:-2px;color:var(--text)}
+.ring-label{font-size:10px;color:var(--text4);letter-spacing:1.5px;font-family:'DM Mono',monospace;margin-top:3px}
+
+/* TIERS */
+.tier-badge{padding:7px 22px;border-radius:30px;font-weight:700;font-size:.95rem;letter-spacing:1px;border:1.5px solid}
+.tier-s{background:var(--green-bg);color:var(--green-dark);border-color:var(--green-border)}
+.tier-a{background:var(--blue-bg);color:var(--pro-h);border-color:var(--blue-border)}
+.tier-b{background:var(--amber-bg);color:var(--amber-dark);border-color:var(--amber-border)}
+.tier-c{background:var(--red-bg);color:var(--red-dark);border-color:var(--red-border)}
+.tier-na{background:var(--surface2);color:var(--text4);border-color:var(--border)}
+.action-text{font-size:12px;color:var(--text3);text-align:center;max-width:230px;line-height:1.65}
+.tags-row{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+.tag{font-size:11px;padding:3px 10px;border-radius:6px;font-family:'DM Mono',monospace;font-weight:600;border:1px solid;cursor:default}
+.tag-conf-high{background:var(--green-bg);color:var(--green-dark);border-color:var(--green-border)}
+.tag-conf-med{background:var(--amber-bg);color:var(--amber-dark);border-color:var(--amber-border)}
+.tag-conf-low{background:var(--red-bg);color:var(--red-dark);border-color:var(--red-border)}
+.tag-na{background:var(--surface2);color:var(--text4);border-color:var(--border)}
+
+.acc-note{font-size:11px;color:var(--amber-dark);font-family:'DM Mono',monospace;text-align:center;line-height:1.7;padding:.5rem .75rem;background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--radius-sm);width:100%}
+.warning-box{background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--radius-sm);padding:.6rem 1rem;width:100%;display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--amber-dark)}
+.suggested{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.85rem 1rem;width:100%}
+.suggested-title{font-size:10px;letter-spacing:1.5px;color:var(--text4);font-family:'DM Mono',monospace;margin-bottom:.5rem;text-transform:uppercase}
+.suggested-item{font-size:12px;color:var(--text2);line-height:1.8;display:flex;align-items:flex-start;gap:6px}
+.suggested-item::before{content:'→';color:var(--pro);font-family:'DM Mono',monospace;flex-shrink:0}
+.nodata-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.1rem;width:100%;text-align:center}
+.empty{text-align:center;padding:3rem;color:var(--text4);font-size:13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+
+/* UPGRADE BOX — aggressive */
+.upgrade-box{background:var(--pro-bg);border:1.5px solid var(--pro-border);border-radius:var(--radius-sm);padding:1.1rem 1rem;width:100%;text-align:center}
+.upgrade-box-title{font-size:11px;color:var(--pro);font-family:'DM Mono',monospace;font-weight:700;margin-bottom:.4rem;letter-spacing:.5px}
+.upgrade-box-features{font-size:11px;color:var(--pro-h);line-height:1.9;margin-bottom:.75rem;opacity:.8}
+.btn-upgrade{background:var(--pro);color:#fff;border:none;padding:12px 24px;border-radius:var(--radius-sm);font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer;width:100%;transition:all .15s;box-shadow:0 4px 12px rgba(99,102,241,.35)}
+.btn-upgrade:hover{background:var(--pro-h);transform:translateY(-1px);box-shadow:0 6px 16px rgba(99,102,241,.4)}
+
+/* BREAKDOWN — locked */
+.breakdown-card{background:#F1F5F9;border:1.5px solid var(--pro-border);border-radius:var(--radius);padding:1.5rem;position:relative;overflow:hidden}
+.breakdown-item{margin-bottom:.85rem;opacity:.25;filter:blur(.5px)}
+.bk-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.bk-name{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace}
+.bk-val{font-size:13px;font-weight:700}
+.bk-bar-bg{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.bk-bar{height:5px;border-radius:3px}
+.breakdown-locked{position:absolute;inset:0;background:rgba(241,245,249,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;z-index:2;backdrop-filter:blur(4px)}
+.bl-title{font-size:15px;font-weight:700;color:var(--pro)}
+.bl-sub{font-size:12px;color:var(--text3);text-align:center;max-width:230px;line-height:1.6}
+
+/* TABLE LOCKED */
+.table-locked{background:var(--surface);border:1.5px solid var(--pro-border);border-radius:var(--radius);padding:3rem;text-align:center;box-shadow:0 4px 12px rgba(99,102,241,.08)}
+
+/* ADD BTN */
+.btn-add-locked{background:var(--pro-bg);color:var(--pro);border:1.5px dashed var(--pro-border);width:100%;margin-top:.5rem;padding:11px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border-radius:var(--radius-sm);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-add-locked:hover{background:var(--pro);color:#fff}
+.btn-del{background:transparent;color:var(--text4);border:none;padding:6px 10px;font-size:13px;cursor:pointer;border-radius:6px;transition:all .15s}
+.btn-del:hover{color:var(--red-dark);background:var(--red-bg)}
+
+/* DOCS */
+.docs-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.docs-toggle-lbl{font-size:13px;font-weight:600;color:var(--text2)}
+.docs-toggle-arrow{font-size:10px;color:var(--text4);font-family:'DM Mono',monospace}
+.docs-body{display:none;margin-top:1.25rem;border-top:1px solid var(--border);padding-top:1.25rem}
+.docs-body.open{display:block}
+.docs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1rem}
+.doc-card{background:var(--surface2);border-radius:var(--radius-sm);padding:.9rem;border-left:3px solid var(--pro)}
+.doc-card.green{border-left-color:var(--green)}
+.doc-card.amber{border-left-color:var(--amber)}
+.doc-title{font-size:12px;font-weight:700;color:var(--pro);font-family:'DM Mono',monospace;margin-bottom:3px}
+.doc-card.green .doc-title{color:var(--green-dark)}
+.doc-card.amber .doc-title{color:var(--amber-dark)}
+.doc-desc{font-size:12px;color:var(--text3);line-height:1.6}
+.tier-table{width:100%;border-collapse:collapse;margin-top:.75rem;font-size:12px}
+.tier-table td{padding:7px 10px;border-bottom:1px solid var(--border)}
+.tier-table tr:last-child td{border-bottom:none}
+.tier-pill{font-size:10px;padding:3px 7px;border-radius:6px;font-weight:700;font-family:'DM Mono',monospace;border:1px solid}
+.tier-pill.s{background:var(--green-bg);color:var(--green-dark);border-color:var(--green-border)}
+.tier-pill.a{background:var(--blue-bg);color:var(--pro-h);border-color:var(--blue-border)}
+.tier-pill.b{background:var(--amber-bg);color:var(--amber-dark);border-color:var(--amber-border)}
+.tier-pill.c{background:var(--red-bg);color:var(--red-dark);border-color:var(--red-border)}
+
+/* MODAL */
+.modal-bd{display:none;position:fixed;inset:0;background:rgba(17,24,39,.6);z-index:999;align-items:center;justify-content:center;padding:1rem}
+.modal-box{background:var(--surface);border:1.5px solid var(--pro-border);border-radius:16px;padding:2.25rem;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(99,102,241,.2);position:relative}
+.modal-close{position:absolute;top:1rem;right:1rem;background:var(--surface2);border:none;border-radius:50%;width:30px;height:30px;font-size:14px;cursor:pointer;color:var(--text3);display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--border-s)}
+.modal-features{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:1.5rem}
+.modal-feat{background:var(--pro-bg);border:1px solid var(--pro-border);border-radius:8px;padding:.75rem;font-size:12px;color:var(--pro);display:flex;align-items:center;gap:6px}
+
+/* FOOTER */
+.footer-sig{margin-top:40px;padding:24px 0 32px;border-top:1px solid var(--border);text-align:center}
+.footer-sig p{font-size:12px;color:var(--text4);line-height:2.2;font-family:'DM Mono',monospace}
+.footer-sig strong{color:var(--text3);font-weight:600}
+</style>
+
+<div class="demo-banner">
+  <div class="demo-banner-text">
+    <div class="demo-dot"></div>
+    Demo version — limited scoring accuracy · Some features locked
+  </div>
+  <button class="btn-banner" onclick="showUpgrade()">🔓 Get PRO version</button>
+</div>
+
+<div class="app">
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">🎯</div>
+      <div>
+        <div class="logo-text">Keyword Scoring Master</div>
+        <div class="logo-sub">Amazon USA Launch · LPS System v1</div>
+      </div>
+    </div>
+    <div class="badge-demo">DEMO</div>
+  </div>
+
+  <!-- GUIDE -->
+  <div class="section-header">
+    <span class="sec-num">GUIDE</span>
+    <span class="sec-title">How does this tool work?</span>
+    <div class="sec-line"></div>
+  </div>
+  <div class="card">
+    <div class="docs-toggle" onclick="toggleDocs()">
+      <span class="docs-toggle-lbl">Click to expand — LPS scoring explained</span>
+      <span class="docs-toggle-arrow" id="docs-arrow">▼ OPEN</span>
+    </div>
+    <div class="docs-body" id="docs-body">
+      <p style="font-size:13px;color:var(--text3);line-height:1.75;margin-bottom:1.25rem">
+        This tool calculates the <strong style="color:var(--text)">LPS (Listing Potential Score)</strong> — a 0–10 score indicating how viable it is to rank on Amazon. Demo uses a simplified model. <span style="color:var(--amber-dark);font-family:'DM Mono',monospace;font-size:11px">PRO version uses the full model for accurate validation.</span>
+      </p>
+      <div class="docs-grid">
+        <div class="doc-card"><div class="doc-title">Search Volume (SV)</div><div class="doc-desc">Monthly searches on Amazon. Pull from Helium 10 Cerebro or Magnet. Required.</div></div>
+        <div class="doc-card"><div class="doc-title">KW Sales</div><div class="doc-desc">Sales attributed to the keyword. Required — no score without real data.</div></div>
+        <div class="doc-card"><div class="doc-title">Competing Products</div><div class="doc-desc">CP ratio impact unlocked in PRO only. Visible but inactive in demo.</div></div>
+        <div class="doc-card green"><div class="doc-title">LPS Score</div><div class="doc-desc">Blended 0–10 score. Demo uses partial model. PRO uses full CP ratio + audit.</div></div>
+        <div class="doc-card amber"><div class="doc-title">Page 1 Audit</div><div class="doc-desc">Sliders capped at 5 in demo. PRO unlocks full 0–10 range and formula weighting.</div></div>
+        <div class="doc-card amber"><div class="doc-title">Multi-keyword</div><div class="doc-desc">Compare unlimited keywords, export CSV, full breakdown. PRO only.</div></div>
+      </div>
+      <div style="margin-top:1.25rem">
+        <div style="font-size:11px;color:var(--text4);font-family:'DM Mono',monospace;margin-bottom:.6rem;letter-spacing:1px">TIER SCALE</div>
+        <table class="tier-table">
+          <tr><td><span class="tier-pill s">S</span></td><td style="color:var(--green-dark);font-weight:700;padding-left:10px">7–10</td><td style="color:var(--text3)">Top priority. Strong data, open market, weak Page 1.</td></tr>
+          <tr><td><span class="tier-pill a">A</span></td><td style="color:var(--pro-h);font-weight:700;padding-left:10px">5–7</td><td style="color:var(--text3)">Strong candidate. Proceed to listing optimization.</td></tr>
+          <tr><td><span class="tier-pill b">B</span></td><td style="color:var(--amber-dark);font-weight:700;padding-left:10px">3–5</td><td style="color:var(--text3)">Moderate potential. Validate before committing.</td></tr>
+          <tr><td><span class="tier-pill c">C</span></td><td style="color:var(--red-dark);font-weight:700;padding-left:10px">0–3</td><td style="color:var(--text3)">Low priority. Weak data or saturated market.</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 01 INPUT -->
+  <div class="section-header">
+    <span class="sec-num">01</span>
+    <span class="sec-title">Helium 10 data input</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" onclick="showUpgrade()">1 keyword · PRO = unlimited</span>
+  </div>
+  <div id="kw-list"></div>
+  <button class="btn-add-locked" onclick="showUpgrade()"><span>🔒</span> Add keyword — PRO only</button>
+
+  <!-- 02 AUDIT -->
+  <div class="section-header">
+    <span class="sec-num">02</span>
+    <span class="sec-title">Page 1 audit · manual scoring</span>
+    <div class="sec-line"></div>
+    <span class="sec-tag" onclick="showUpgrade()">Max 5 · PRO = full 0–10</span>
+  </div>
+  <div class="card">
+    <div class="audit-grid">
+      <div class="audit-field">
+        <div class="audit-lbl">RS · Review Score</div>
+        <div class="audit-sub">0 = many reviews · 5 max in demo</div>
+        <div class="slider-row"><input type="range" min="0" max="5" step="0.5" value="3" id="sl-rs" oninput="syncSlider('rs')"><span class="slider-num" id="out-rs">3.0</span></div>
+      </div>
+      <div class="audit-field">
+        <div class="audit-lbl">RAS · Rating Score</div>
+        <div class="audit-sub">0 = high ratings · 5 max in demo</div>
+        <div class="slider-row"><input type="range" min="0" max="5" step="0.5" value="3" id="sl-ras" oninput="syncSlider('ras')"><span class="slider-num" id="out-ras">3.0</span></div>
+      </div>
+      <div class="audit-field">
+        <div class="audit-lbl">IQS · Image Quality</div>
+        <div class="audit-sub">0 = top images · 5 max in demo</div>
+        <div class="slider-row"><input type="range" min="0" max="5" step="0.5" value="3" id="sl-iqs" oninput="syncSlider('iqs')"><span class="slider-num" id="out-iqs">3.0</span></div>
+      </div>
+      <div class="audit-field">
+        <div class="audit-lbl">PPS · Price Position</div>
+        <div class="audit-sub">0 = strong prices · 5 max in demo</div>
+        <div class="slider-row"><input type="range" min="0" max="5" step="0.5" value="3" id="sl-pps" oninput="syncSlider('pps')"><span class="slider-num" id="out-pps">3.0</span></div>
+      </div>
+      <div class="audit-field">
+        <div class="audit-lbl">VCS · Variations</div>
+        <div class="audit-sub">0 = many · 5 max in demo</div>
+        <div class="slider-row"><input type="range" min="0" max="5" step="0.5" value="3" id="sl-vcs" oninput="syncSlider('vcs')"><span class="slider-num" id="out-vcs">3.0</span></div>
+      </div>
+      <div class="audit-field">
+        <div class="audit-lbl">BDS · Brand Dominance</div>
+        <div class="audit-sub">0 = strong brands · 5 max in demo</div>
+        <div class="slider-row"><input type="range" min="0" max="5" step="0.5" value="3" id="sl-bds" oninput="syncSlider('bds')"><span class="slider-num" id="out-bds">3.0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 MULT -->
+  <div class="section-header">
+    <span class="sec-num">03</span>
+    <span class="sec-title">Multipliers</span>
+    <div class="sec-line"></div>
+  </div>
+  <div class="card">
+    <div class="mult-grid">
+      <div class="field">
+        <div class="field-label">P1WS · Page 1 Weakness</div>
+        <input type="number" id="p1ws" value="5" min="0" max="10" step="0.1" oninput="calculate()">
+      </div>
+      <div class="field">
+        <div class="field-label">Confidence Multiplier <span class="pro-lock" onclick="showUpgrade()">🔒 PRO</span></div>
+        <input type="number" id="conf" value="1" disabled>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 RESULTS -->
+  <div class="section-header">
+    <span class="sec-num">04</span>
+    <span class="sec-title">Results</span>
+    <div class="sec-line"></div>
+  </div>
+  <div id="results-area">
+    <div class="empty"><div style="font-size:2rem;opacity:.12;margin-bottom:.5rem">📊</div>Add a keyword above to see your LPS score</div>
+  </div>
+  <div id="table-area"></div>
+
+  <div class="footer-sig">
+    <p><strong>Keyword Scoring Master</strong> · Amazon FBA LPS System</p>
+    <p>Demo Version · <a href="#" onclick="showUpgrade();return false" style="color:var(--pro);text-decoration:none;font-weight:700">Upgrade to PRO for full access</a></p>
+    <p>Powered by ALOR Systems · contact@alorlogic.com</p>
+    <p style="font-size:10px;opacity:.5;margin-top:4px">Not affiliated with Amazon. For educational purposes only. © 2026 ALOR LOGISTICS LLC</p>
+  </div>
+</div>
+
+<!-- UPGRADE MODAL -->
+<div class="modal-bd" id="upgrade-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeUpgrade()">✕</button>
+    <div style="text-align:center;margin-bottom:1.75rem">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">🔓</div>
+      <div style="font-size:1.3rem;font-weight:700;color:var(--pro);margin-bottom:.3rem">Keyword Scoring Master PRO</div>
+      <div style="font-size:11px;color:var(--text4);font-family:'DM Mono',monospace;letter-spacing:.5px">Full model · Unlimited keywords · One-time purchase</div>
+    </div>
+    <div class="modal-features">
+      <div class="modal-feat"><span style="color:var(--pro);font-weight:700">✓</span> Unlimited keywords</div>
+      <div class="modal-feat"><span style="color:var(--pro);font-weight:700">✓</span> Full CP ratio impact</div>
+      <div class="modal-feat"><span style="color:var(--pro);font-weight:700">✓</span> Full audit 0–10</div>
+      <div class="modal-feat"><span style="color:var(--pro);font-weight:700">✓</span> Score breakdown</div>
+      <div class="modal-feat"><span style="color:var(--pro);font-weight:700">✓</span> Keyword comparison</div>
+      <div class="modal-feat"><span style="color:var(--pro);font-weight:700">✓</span> Export CSV</div>
+      <div class="modal-feat"><span style="color:var(--pro);font-weight:700">✓</span> Confidence multiplier</div>
+      <div class="modal-feat"><span style="color:var(--pro);font-weight:700">✓</span> Formula logic visible</div>
+    </div>
+    <button class="btn-upgrade" onclick="closeUpgrade()">Get PRO — contact@alorlogic.com</button>
+    <div style="font-size:10px;color:var(--text4);text-align:center;margin-top:.75rem;font-family:'DM Mono',monospace">Instant delivery after purchase</div>
+  </div>
+</div>
+
+<script>
+let keywords=[];
+const LPS_ANCHOR=3.3;
+const tierColors={S:'#15803D',A:'#4F46E5',B:'#92400E',C:'#991B1B'};
+
+function showUpgrade(){document.getElementById('upgrade-modal').style.display='flex'}
+function closeUpgrade(){document.getElementById('upgrade-modal').style.display='none'}
+function toggleDocs(){
+  const b=document.getElementById('docs-body'),a=document.getElementById('docs-arrow');
+  b.classList.toggle('open');
+  a.textContent=b.classList.contains('open')?'▲ CLOSE':'▼ OPEN';
+}
+function addKeyword(){
+  if(keywords.length>=1)return;
+  keywords.push({id:1,kw:'',sv:'',ks:''});
+  renderList();calculate();
+}
+function removeKeyword(){keywords=[];renderList();calculate();}
+function renderList(){
+  const el=document.getElementById('kw-list');
+  if(!keywords.length){el.innerHTML='';return;}
+  el.innerHTML=`
+    <div class="input-panel">
+      <div class="input-grid">
+        <div class="field"><div class="field-label">Keyword</div><input type="text" placeholder="e.g. dog harness no pull" oninput="updateKw('kw',this.value)"></div>
+        <div class="field"><div class="field-label">Search Volume</div><input type="number" placeholder="e.g. 8500" oninput="updateKw('sv',this.value)"></div>
+        <div class="field"><div class="field-label">KW Sales</div><input type="number" placeholder="e.g. 320" oninput="updateKw('ks',this.value)"></div>
+        <div class="field"><div class="field-label">Competing Products <span class="pro-lock" onclick="showUpgrade()">🔒 PRO</span></div><input type="number" placeholder="PRO only" disabled></div>
+        <div style="display:flex;align-items:flex-end;padding-bottom:2px"><button class="btn-del" onclick="removeKeyword()">✕</button></div>
+      </div>
+      <div class="derived-row">
+        <div class="derived-card"><div><div class="derived-label">BIS</div><div class="derived-sub">Buy Intent Score</div></div><div class="derived-val" id="bis-1">—</div></div>
+        <div class="derived-card"><div><div class="derived-label">CEI</div><div class="derived-sub">Competitive Entry</div></div><div class="derived-val" id="cei-1">—</div></div>
+        <div class="derived-card locked"><div><div class="derived-label">CP Ratio <span class="pro-lock" style="font-size:9px;padding:1px 5px" onclick="showUpgrade()">🔒</span></div><div class="derived-sub">PRO only</div></div><div class="derived-val" style="color:var(--text4)">—</div></div>
+        <div class="derived-card hl"><div><div class="derived-label">LPS Base</div><div class="derived-sub">Normalized 0–10</div></div><div class="derived-val" id="lpsb-1">—</div></div>
+      </div>
+    </div>`;
+}
+function updateKw(field,val){if(keywords[0])keywords[0][field]=val;calculate();}
+function syncSlider(name){
+  const val=parseFloat(document.getElementById('sl-'+name).value);
+  document.getElementById('out-'+name).textContent=val.toFixed(1);
+  calculate();
+}
+function getAudit(){
+  return{rs:parseFloat(document.getElementById('sl-rs').value),ras:parseFloat(document.getElementById('sl-ras').value),iqs:parseFloat(document.getElementById('sl-iqs').value),pps:parseFloat(document.getElementById('sl-pps').value),vcs:parseFloat(document.getElementById('sl-vcs').value),bds:parseFloat(document.getElementById('sl-bds').value)};
+}
+function calcDemo(k,audit){
+  const sv=parseFloat(k.sv),ks=parseFloat(k.ks);
+  const p1ws=Math.max(0,Math.min(10,parseFloat(document.getElementById('p1ws').value)||5));
+  const auditAvg=(audit.rs+audit.ras+audit.iqs+audit.pps+audit.vcs+audit.bds)/6;
+  const hasData=!isNaN(sv)&&sv>0&&!isNaN(ks)&&ks>0;
+  if(!hasData)return{hasData:false,bis:'0',lpsNorm:'0',lpsFinal:null,auditAvg,confLevel:'—',confCls:'tag-na',warning:null,decision:'N/A',actions:[]};
+  const bis=ks;
+  const lpsRaw=bis*0.8;
+  const lpsNorm=Math.min(Math.log10(lpsRaw+1)/LPS_ANCHOR*10,10);
+  let softPenalty=1,warning=null;
+  if(sv<500||ks<10){softPenalty=0.40;warning='Very low search volume or sales — limited demand signal.';}
+  else if(sv<1000||ks<50){softPenalty=0.65;warning='Low volume keyword — validate demand before committing.';}
+  const blended=(lpsNorm*0.65)+(auditAvg*0.20)+(p1ws*0.15);
+  const lpsFinal=Math.min(Math.max(blended*softPenalty,0),10);
+  let confLevel,confCls;
+  if(sv>2000&&ks>100){confLevel='Medium Confidence';confCls='tag-conf-med';}
+  else if(sv>500&&ks>10){confLevel='Medium Confidence';confCls='tag-conf-med';}
+  else{confLevel='Low Confidence';confCls='tag-conf-low';}
+  let decision,actions;
+  if(lpsFinal>=7){decision='Launch';actions=['Looks promising — upgrade to PRO for full validation'];}
+  else if(lpsFinal>=5){decision='Evaluate';actions=['Moderate potential — upgrade to PRO for full analysis'];}
+  else if(lpsFinal>=3){decision='Monitor';actions=['Low-moderate signal — upgrade to PRO for full picture'];}
+  else{decision='Skip';actions=['Weak signal — upgrade to PRO to confirm'];}
+  return{hasData:true,bis:bis.toFixed(1),lpsNorm:lpsNorm.toFixed(2),lpsFinal,auditAvg,confLevel,confCls,warning,decision,actions};
+}
+function getTier(s){
+  if(s>=7)return{tier:'S',cls:'tier-s',action:'Top priority · Strong demand signal detected'};
+  if(s>=5)return{tier:'A',cls:'tier-a',action:'Strong opportunity · Proceed with validation'};
+  if(s>=3)return{tier:'B',cls:'tier-b',action:'Moderate potential · Needs deeper analysis'};
+  return{tier:'C',cls:'tier-c',action:'Low priority · Consider alternative keywords'};
+}
+function drawRing(score,hex){
+  const R=72,cx=85,cy=85,circ=2*Math.PI*R,dash=circ*Math.min(score/10,1);
+  return`<svg viewBox="0 0 170 170" width="170" height="170"><circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#E2E8F0" stroke-width="12"/><circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${hex}" stroke-width="12" stroke-dasharray="${dash.toFixed(2)} ${circ.toFixed(2)}" stroke-dashoffset="${(circ/4).toFixed(2)}" stroke-linecap="round"/></svg>`;
+}
+function drawRingNA(){
+  return`<svg viewBox="0 0 170 170" width="170" height="170"><circle cx="85" cy="85" r="72" fill="none" stroke="#E2E8F0" stroke-width="12" stroke-dasharray="10 7"/></svg>`;
+}
+function buildBreakdown(audit){
+  const items=[
+    {name:'RS · Review Score',val:audit.rs,color:'#6366F1'},
+    {name:'RAS · Rating Score',val:audit.ras,color:'#8B5CF6'},
+    {name:'IQS · Image Quality',val:audit.iqs,color:'#22C55E'},
+    {name:'PPS · Price Position',val:audit.pps,color:'#F59E0B'},
+    {name:'VCS · Variations',val:audit.vcs,color:'#EF4444'},
+    {name:'BDS · Brand Dominance',val:audit.bds,color:'#6B7280'},
+  ];
+  return`<div class="breakdown-card">
+    <div style="font-size:11px;color:var(--text4);font-family:'DM Mono',monospace;margin-bottom:1.25rem;letter-spacing:1px;text-transform:uppercase">Page 1 Audit Breakdown</div>
+    ${items.map(it=>`<div class="breakdown-item"><div class="bk-header"><span class="bk-name">${it.name}</span><span class="bk-val" style="color:${it.color}">${it.val.toFixed(1)}</span></div><div class="bk-bar-bg"><div class="bk-bar" style="width:${it.val*20}%;background:${it.color}"></div></div></div>`).join('')}
+    <div class="breakdown-locked">
+      <div style="font-size:2rem">🔒</div>
+      <div class="bl-title">Full breakdown · PRO only</div>
+      <div class="bl-sub">Score formula, audit weights, CP ratio impact and full formula logic</div>
+      <button class="btn-upgrade" style="max-width:200px;padding:10px 16px;font-size:12px" onclick="showUpgrade()">Get PRO version</button>
+    </div>
+  </div>`;
+}
+function calculate(){
+  if(!keywords.length){
+    document.getElementById('results-area').innerHTML='<div class="empty"><div style="font-size:2rem;opacity:.12;margin-bottom:.5rem">📊</div>Add a keyword above to see your LPS score</div>';
+    document.getElementById('table-area').innerHTML='';return;
+  }
+  const audit=getAudit();
+  const r=calcDemo(keywords[0],audit);
+  const bisEl=document.getElementById('bis-1');
+  const ceiEl=document.getElementById('cei-1');
+  const lpsbEl=document.getElementById('lpsb-1');
+  if(r.hasData){
+    if(bisEl)bisEl.textContent=parseFloat(r.bis).toLocaleString();
+    if(ceiEl)ceiEl.textContent=parseFloat(r.bis).toFixed(2);
+    if(lpsbEl)lpsbEl.textContent=parseFloat(r.lpsNorm).toFixed(2);
+  } else {
+    [bisEl,ceiEl,lpsbEl].forEach(el=>{if(el){el.textContent='—';el.style.color='var(--text4)';}});
+  }
+  if(!r.hasData){
+    document.getElementById('results-area').innerHTML=`
+      <div class="results-grid">
+        <div class="score-card">
+          <div class="ring-wrap">${drawRingNA()}<div class="ring-center"><div class="ring-score" style="color:#9CA3AF;font-size:2.2rem">N/A</div><div class="ring-label">AWAITING INPUT</div></div></div>
+          <div class="tier-badge tier-na">NO DATA</div>
+          <div class="action-text">Enter Search Volume and KW Sales to activate scoring</div>
+          <div class="nodata-box"><div style="font-size:11px;color:var(--text4);font-family:'DM Mono',monospace;margin-bottom:.5rem;letter-spacing:1px">REQUIRED FIELDS</div><div style="font-size:13px;color:var(--text3);line-height:2">Search Volume (SV)<br>KW Sales</div></div>
+        </div>
+        ${buildBreakdown(audit)}
+      </div>`;
+    document.getElementById('table-area').innerHTML='';return;
+  }
+  const bestScore=Math.min(r.lpsFinal,10);
+  const{tier,cls,action}=getTier(bestScore);
+  const hex=tierColors[tier];
+  document.getElementById('results-area').innerHTML=`
+    <div class="results-grid">
+      <div class="score-card">
+        <div class="ring-wrap">${drawRing(bestScore,hex)}<div class="ring-center"><div class="ring-score" style="color:${hex}">${bestScore.toFixed(1)}</div><div class="ring-label">LPS SCORE</div></div></div>
+        <div class="tier-badge ${cls}">TIER ${tier}</div>
+        <div class="action-text">${action}</div>
+        <div class="acc-note">⚠ Demo uses simplified model · PRO gives accurate validation</div>
+        <div class="tags-row">
+          <span class="tag ${r.confCls}">${r.confLevel}</span>
+          <span class="tag tag-na" style="cursor:pointer" onclick="showUpgrade()">CP Ratio 🔒 PRO</span>
+        </div>
+        ${r.warning?`<div class="warning-box"><span style="flex-shrink:0">⚠</span><span>${r.warning}</span></div>`:''}
+        <div class="suggested">
+          <div class="suggested-title">Suggested action</div>
+          ${r.actions.map(a=>`<div class="suggested-item">${a}</div>`).join('')}
+          <div style="margin-top:.5rem;font-size:10px;color:var(--pro);font-family:'DM Mono',monospace;cursor:pointer" onclick="showUpgrade()">🔒 Full action plan in PRO version</div>
+        </div>
+        <div class="upgrade-box">
+          <div class="upgrade-box-title">🔓 UNLOCK FULL SCORING</div>
+          <div class="upgrade-box-features">CP Ratio · Full audit 0–10 · Multi-keyword · Score breakdown · Export CSV</div>
+          <button class="btn-upgrade" onclick="showUpgrade()">Get PRO version</button>
+        </div>
+      </div>
+      ${buildBreakdown(audit)}
+    </div>`;
+  document.getElementById('table-area').innerHTML=`
+    <div class="section-header" style="margin-top:0">
+      <span class="sec-num">05</span>
+      <span class="sec-title">Keyword comparison</span>
+      <div class="sec-line"></div>
+      <span class="sec-tag" onclick="showUpgrade()">PRO only</span>
+    </div>
+    <div class="table-locked">
+      <div style="font-size:2rem;margin-bottom:.75rem">🔒</div>
+      <div style="font-size:15px;font-weight:700;color:var(--pro);margin-bottom:.5rem">Multi-keyword comparison · PRO only</div>
+      <div style="font-size:13px;color:var(--text3);line-height:1.7;max-width:360px;margin:0 auto 1.25rem">Compare unlimited keywords, full scoring breakdown, export CSV, find your best launch opportunity.</div>
+      <button class="btn-upgrade" style="max-width:240px;margin:0 auto" onclick="showUpgrade()">Get PRO version</button>
+    </div>`;
+}
+addKeyword();
+</script>
+</html>
